@@ -1,0 +1,28 @@
+(declare-datatypes () ((Tok (X) (Y) (Z))))
+(declare-datatypes () ((list (nil) (cons (head Tok) (tail list)))))
+(declare-datatypes () ((B2 (SB (SB_0 B2)) (ZB))))
+(declare-datatypes () ((A2 (SA (SA_0 A2)) (ZA))))
+(declare-datatypes () ((S (A (A_0 A2)) (B (B_0 B2)))))
+(declare-fun append (list list) list)
+(declare-fun linA (A2) list)
+(declare-fun linB (B2) list)
+(declare-fun linS (S) list)
+(assert (forall ((y list)) (= (append nil y) y)))
+(assert
+  (forall ((y list) (z Tok) (xs list))
+    (= (append (cons z xs) y) (cons z (append xs y)))))
+(assert
+  (forall ((a A2))
+    (= (linA (SA a))
+      (append (append (cons X nil) (linA a)) (cons Y nil)))))
+(assert (= (linA ZA) (cons X (cons Z (cons Y nil)))))
+(assert
+  (forall ((b B2))
+    (= (linB (SB b))
+      (append (append (cons X nil) (linB b)) (cons Y (cons Y nil))))))
+(assert (= (linB ZB) (cons X (cons Z (cons Y (cons Y nil))))))
+(assert (forall ((a A2)) (= (linS (A a)) (linA a))))
+(assert (forall ((b B2)) (= (linS (B b)) (linB b))))
+(assert-not
+  (forall ((u S) (v S)) (=> (= (linS u) (linS v)) (= u v))))
+(check-sat)

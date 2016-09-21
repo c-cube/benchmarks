@@ -1,0 +1,31 @@
+(declare-sort fun1 2)
+(declare-sort sk 0)
+(declare-datatypes ()
+  ((list2 (nil2) (cons2 (head2 sk) (tail2 list2)))))
+(declare-datatypes ()
+  ((list (nil) (cons (head list2) (tail list)))))
+(declare-fun (par (a b) (apply1 ((fun1 a b) a) b)))
+(declare-fun map2 ((fun1 sk list2) list2) list)
+(declare-fun append (list2 list2) list2)
+(declare-fun bind (list2 (fun1 sk list2)) list2)
+(declare-fun concat2 (list) list2)
+(assert (forall ((x (fun1 sk list2))) (= (map2 x nil2) nil)))
+(assert
+  (forall ((x (fun1 sk list2)) (z sk) (xs list2))
+    (= (map2 x (cons2 z xs)) (cons (apply1 x z) (map2 x xs)))))
+(assert (forall ((y list2)) (= (append nil2 y) y)))
+(assert
+  (forall ((y list2) (z sk) (xs list2))
+    (= (append (cons2 z xs) y) (cons2 z (append xs y)))))
+(assert (forall ((y (fun1 sk list2))) (= (bind nil2 y) nil2)))
+(assert
+  (forall ((y (fun1 sk list2)) (z sk) (xs list2))
+    (= (bind (cons2 z xs) y) (append (apply1 y z) (bind xs y)))))
+(assert (= (concat2 nil) nil2))
+(assert
+  (forall ((xs list2) (xss list))
+    (= (concat2 (cons xs xss)) (append xs (concat2 xss)))))
+(assert-not
+  (forall ((f (fun1 sk list2)) (xs list2))
+    (= (concat2 (map2 f xs)) (bind xs f))))
+(check-sat)

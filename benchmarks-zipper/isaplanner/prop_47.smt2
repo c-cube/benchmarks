@@ -1,0 +1,22 @@
+(declare-sort sk 0)
+(declare-datatypes ()
+  ((Tree (Leaf) (Node (Node_0 Tree) (Node_1 sk) (Node_2 Tree)))))
+(declare-datatypes () ((Nat (Z) (S (p Nat)))))
+(declare-fun mirror (Tree) Tree)
+(declare-fun max2 (Nat Nat) Nat)
+(declare-fun height (Tree) Nat)
+(assert (= (mirror Leaf) Leaf))
+(assert
+  (forall ((l Tree) (y sk) (r Tree))
+    (= (mirror (Node l y r)) (Node (mirror r) y (mirror l)))))
+(assert (forall ((y Nat)) (= (max2 Z y) y)))
+(assert (forall ((z Nat)) (= (max2 (S z) Z) (S z))))
+(assert
+  (forall ((z Nat) (x2 Nat))
+    (= (max2 (S z) (S x2)) (S (max2 z x2)))))
+(assert (= (height Leaf) Z))
+(assert
+  (forall ((l Tree) (y sk) (r Tree))
+    (= (height (Node l y r)) (S (max2 (height l) (height r))))))
+(assert-not (forall ((b Tree)) (= (height (mirror b)) (height b))))
+(check-sat)

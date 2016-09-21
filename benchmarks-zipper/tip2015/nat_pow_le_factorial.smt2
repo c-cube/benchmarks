@@ -1,0 +1,30 @@
+(declare-sort sk 0)
+(declare-datatypes () ((Nat (Z) (S (p Nat)))))
+(declare-fun plus (Nat Nat) Nat)
+(declare-fun mult (Nat Nat) Nat)
+(declare-fun lt (Nat Nat) Bool)
+(declare-fun factorial (Nat) Nat)
+(declare-const ^1 Nat)
+(declare-fun pow (Nat Nat) Nat)
+(assert (forall ((y Nat)) (= (plus Z y) y)))
+(assert
+  (forall ((y Nat) (n Nat)) (= (plus (S n) y) (S (plus n y)))))
+(assert (forall ((y Nat)) (= (mult Z y) Z)))
+(assert
+  (forall ((y Nat) (n Nat)) (= (mult (S n) y) (plus y (mult n y)))))
+(assert (forall ((x Nat)) (= (lt x Z) false)))
+(assert (forall ((z Nat)) (= (lt Z (S z)) true)))
+(assert (forall ((z Nat) (n Nat)) (= (lt (S n) (S z)) (lt n z))))
+(assert (= (factorial Z) (S Z)))
+(assert
+  (forall ((n Nat))
+    (= (factorial (S n)) (mult (S n) (factorial n)))))
+(assert (= ^1 (S Z)))
+(assert (forall ((x Nat)) (= (pow x Z) ^1)))
+(assert
+  (forall ((x Nat) (m Nat)) (= (pow x (S m)) (mult x (pow x m)))))
+(assert-not
+  (forall ((n Nat))
+    (lt (pow (S (S Z)) (S (S (S (S n)))))
+      (factorial (S (S (S (S n))))))))
+(check-sat)

@@ -1,0 +1,27 @@
+(declare-sort sk 0)
+(declare-datatypes ()
+  ((list2 (nil2) (cons2 (head2 sk) (tail2 list2)))))
+(declare-datatypes ()
+  ((list (nil) (cons (head list2) (tail list)))))
+(declare-fun append (list2 list2) list2)
+(declare-fun rev (list2) list2)
+(declare-fun qrevflat (list list2) list2)
+(declare-fun revflat (list) list2)
+(assert (forall ((y list2)) (= (append nil2 y) y)))
+(assert
+  (forall ((y list2) (z sk) (xs list2))
+    (= (append (cons2 z xs) y) (cons2 z (append xs y)))))
+(assert (= (rev nil2) nil2))
+(assert
+  (forall ((y sk) (xs list2))
+    (= (rev (cons2 y xs)) (append (rev xs) (cons2 y nil2)))))
+(assert (forall ((y list2)) (= (qrevflat nil y) y)))
+(assert
+  (forall ((y list2) (xs list2) (xss list))
+    (= (qrevflat (cons xs xss) y) (qrevflat xss (append (rev xs) y)))))
+(assert (= (revflat nil) nil2))
+(assert
+  (forall ((xs list2) (xss list))
+    (= (revflat (cons xs xss)) (append (revflat xss) (rev xs)))))
+(assert-not (forall ((x list)) (= (revflat x) (qrevflat x nil2))))
+(check-sat)

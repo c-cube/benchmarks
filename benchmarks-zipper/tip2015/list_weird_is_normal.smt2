@@ -1,0 +1,26 @@
+(declare-sort sk 0)
+(declare-datatypes ()
+  ((list2 (nil2) (cons2 (head2 sk) (tail2 list2)))))
+(declare-datatypes ()
+  ((list (nil) (cons (head list2) (tail list)))))
+(declare-fun weird_concat (list) list2)
+(declare-fun append (list2 list2) list2)
+(declare-fun concat2 (list) list2)
+(assert (= (weird_concat nil) nil2))
+(assert
+  (forall ((xss list))
+    (= (weird_concat (cons nil2 xss)) (weird_concat xss))))
+(assert
+  (forall ((xss list) (z sk) (xs list2))
+    (= (weird_concat (cons (cons2 z xs) xss))
+      (cons2 z (weird_concat (cons xs xss))))))
+(assert (forall ((y list2)) (= (append nil2 y) y)))
+(assert
+  (forall ((y list2) (z sk) (xs list2))
+    (= (append (cons2 z xs) y) (cons2 z (append xs y)))))
+(assert (= (concat2 nil) nil2))
+(assert
+  (forall ((xs list2) (xss list))
+    (= (concat2 (cons xs xss)) (append xs (concat2 xss)))))
+(assert-not (forall ((x list)) (= (concat2 x) (weird_concat x))))
+(check-sat)

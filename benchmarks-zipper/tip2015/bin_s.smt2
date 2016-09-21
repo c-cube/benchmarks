@@ -1,0 +1,22 @@
+(declare-sort sk 0)
+(declare-datatypes () ((Nat (Z) (S (p Nat)))))
+(declare-datatypes ()
+  ((Bin (One) (ZeroAnd (ZeroAnd_0 Bin)) (OneAnd (OneAnd_0 Bin)))))
+(declare-fun s (Bin) Bin)
+(declare-fun plus (Nat Nat) Nat)
+(declare-fun toNat (Bin) Nat)
+(assert (= (s One) (ZeroAnd One)))
+(assert (forall ((xs Bin)) (= (s (ZeroAnd xs)) (OneAnd xs))))
+(assert (forall ((ys Bin)) (= (s (OneAnd ys)) (ZeroAnd (s ys)))))
+(assert (forall ((y Nat)) (= (plus Z y) y)))
+(assert
+  (forall ((y Nat) (n Nat)) (= (plus (S n) y) (S (plus n y)))))
+(assert (= (toNat One) (S Z)))
+(assert
+  (forall ((xs Bin))
+    (= (toNat (ZeroAnd xs)) (plus (toNat xs) (toNat xs)))))
+(assert
+  (forall ((ys Bin))
+    (= (toNat (OneAnd ys)) (S (plus (toNat ys) (toNat ys))))))
+(assert-not (forall ((n Bin)) (= (toNat (s n)) (S (toNat n)))))
+(check-sat)

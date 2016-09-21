@@ -1,0 +1,26 @@
+(declare-sort sk 0)
+(declare-datatypes () ((list (nil) (cons (head sk) (tail list)))))
+(declare-datatypes ()
+  ((Tree (Node (Node_0 Tree) (Node_1 sk) (Node_2 Tree)) (Nil))))
+(declare-fun flatten3 (Tree) list)
+(declare-fun append (list list) list)
+(declare-fun flatten0 (Tree) list)
+(assert
+  (forall ((z sk) (r Tree) (p Tree) (x2 sk) (q Tree))
+    (= (flatten3 (Node (Node p x2 q) z r))
+      (flatten3 (Node p x2 (Node q z r))))))
+(assert
+  (forall ((z sk) (r Tree))
+    (= (flatten3 (Node Nil z r)) (cons z (flatten3 r)))))
+(assert (= (flatten3 Nil) nil))
+(assert (forall ((y list)) (= (append nil y) y)))
+(assert
+  (forall ((y list) (z sk) (xs list))
+    (= (append (cons z xs) y) (cons z (append xs y)))))
+(assert
+  (forall ((p Tree) (y sk) (q Tree))
+    (= (flatten0 (Node p y q))
+      (append (append (flatten0 p) (cons y nil)) (flatten0 q)))))
+(assert (= (flatten0 Nil) nil))
+(assert-not (forall ((p Tree)) (= (flatten3 p) (flatten0 p))))
+(check-sat)

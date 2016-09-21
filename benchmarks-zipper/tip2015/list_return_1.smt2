@@ -1,0 +1,20 @@
+(declare-sort fun1 2)
+(declare-sort sk 0)
+(declare-datatypes () ((list (nil) (cons (head sk) (tail list)))))
+(declare-fun (par (a b) (apply1 ((fun1 a b) a) b)))
+(declare-fun return (sk) list)
+(declare-fun append (list list) list)
+(declare-fun bind (list (fun1 sk list)) list)
+(assert (forall ((x sk)) (= (return x) (cons x nil))))
+(assert (forall ((y list)) (= (append nil y) y)))
+(assert
+  (forall ((y list) (z sk) (xs list))
+    (= (append (cons z xs) y) (cons z (append xs y)))))
+(assert (forall ((y (fun1 sk list))) (= (bind nil y) nil)))
+(assert
+  (forall ((y (fun1 sk list)) (z sk) (xs list))
+    (= (bind (cons z xs) y) (append (apply1 y z) (bind xs y)))))
+(assert-not
+  (forall ((x sk) (f (fun1 sk list)))
+    (= (bind (return x) f) (apply1 f x))))
+(check-sat)

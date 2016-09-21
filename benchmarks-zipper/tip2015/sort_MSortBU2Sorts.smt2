@@ -1,0 +1,72 @@
+(declare-datatypes () ((Nat (Z) (S (p Nat)))))
+(declare-datatypes ()
+  ((list2 (nil2) (cons2 (head2 Nat) (tail2 list2)))))
+(declare-datatypes ()
+  ((list (nil) (cons (head list2) (tail list)))))
+(declare-fun zordered (list2) Bool)
+(declare-fun risers (list2) list)
+(declare-fun lmerge (list2 list2) list2)
+(declare-fun pairwise (list) list)
+(declare-fun mergingbu2 (list) list2)
+(declare-fun msortbu2 (list2) list2)
+(declare-fun le (Nat Nat) Bool)
+(assert (= (zordered nil2) true))
+(assert (forall ((y Nat)) (= (zordered (cons2 y nil2)) true)))
+(assert
+  (forall ((y Nat) (y2 Nat) (xs list2))
+    (= (zordered (cons2 y (cons2 y2 xs)))
+      (and (le y y2) (zordered (cons2 y2 xs))))))
+(assert (= (risers nil2) nil))
+(assert
+  (forall ((y Nat))
+    (= (risers (cons2 y nil2)) (cons (cons2 y nil2) nil))))
+(assert
+  (forall ((y Nat) (y2 Nat) (xs list2))
+    (=> (= (le y y2) true)
+      (=> (= (risers (cons2 y2 xs)) nil)
+        (= (risers (cons2 y (cons2 y2 xs))) nil)))))
+(assert
+  (forall ((y Nat) (y2 Nat) (xs list2) (ys list2) (yss list))
+    (=> (= (le y y2) true)
+      (=> (= (risers (cons2 y2 xs)) (cons ys yss))
+        (= (risers (cons2 y (cons2 y2 xs))) (cons (cons2 y ys) yss))))))
+(assert
+  (forall ((y Nat) (y2 Nat) (xs list2))
+    (=> (= (le y y2) false)
+      (= (risers (cons2 y (cons2 y2 xs)))
+        (cons (cons2 y nil2) (risers (cons2 y2 xs)))))))
+(assert (forall ((y list2)) (= (lmerge nil2 y) y)))
+(assert
+  (forall ((z Nat) (x2 list2))
+    (= (lmerge (cons2 z x2) nil2) (cons2 z x2))))
+(assert
+  (forall ((z Nat) (x2 list2) (x3 Nat) (x4 list2))
+    (=> (= (le z x3) true)
+      (= (lmerge (cons2 z x2) (cons2 x3 x4))
+        (cons2 z (lmerge x2 (cons2 x3 x4)))))))
+(assert
+  (forall ((z Nat) (x2 list2) (x3 Nat) (x4 list2))
+    (=> (= (le z x3) false)
+      (= (lmerge (cons2 z x2) (cons2 x3 x4))
+        (cons2 x3 (lmerge (cons2 z x2) x4))))))
+(assert (= (pairwise nil) nil))
+(assert
+  (forall ((xs list2)) (= (pairwise (cons xs nil)) (cons xs nil))))
+(assert
+  (forall ((xs list2) (ys list2) (xss list))
+    (= (pairwise (cons xs (cons ys xss)))
+      (cons (lmerge xs ys) (pairwise xss)))))
+(assert (= (mergingbu2 nil) nil2))
+(assert (forall ((xs list2)) (= (mergingbu2 (cons xs nil)) xs)))
+(assert
+  (forall ((xs list2) (z list2) (x2 list))
+    (= (mergingbu2 (cons xs (cons z x2)))
+      (mergingbu2 (pairwise (cons xs (cons z x2)))))))
+(assert
+  (forall ((x list2)) (= (msortbu2 x) (mergingbu2 (risers x)))))
+(assert (forall ((y Nat)) (= (le Z y) true)))
+(assert (forall ((z Nat)) (= (le (S z) Z) false)))
+(assert
+  (forall ((z Nat) (x2 Nat)) (= (le (S z) (S x2)) (le z x2))))
+(assert-not (forall ((x list2)) (zordered (msortbu2 x))))
+(check-sat)

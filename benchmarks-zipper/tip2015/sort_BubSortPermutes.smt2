@@ -1,0 +1,62 @@
+(declare-datatypes () ((Nat (Z) (S (p Nat)))))
+(declare-datatypes () ((list (nil) (cons (head Nat) (tail list)))))
+(declare-datatypes () ((Pair (Pair2 (first Bool) (second list)))))
+(declare-fun zelem (Nat list) Bool)
+(declare-fun zdelete (Nat list) list)
+(declare-fun null (list) Bool)
+(declare-fun zisPermutation (list list) Bool)
+(declare-fun bubble (list) Pair)
+(declare-fun bubsort (list) list)
+(declare-fun le (Nat Nat) Bool)
+(declare-fun equal (Nat Nat) Bool)
+(assert (forall ((x Nat)) (= (zelem x nil) false)))
+(assert
+  (forall ((x Nat) (z Nat) (ys list))
+    (= (zelem x (cons z ys)) (or (equal x z) (zelem x ys)))))
+(assert (forall ((x Nat)) (= (zdelete x nil) nil)))
+(assert
+  (forall ((x Nat) (z Nat) (ys list))
+    (=> (= (equal x z) true) (= (zdelete x (cons z ys)) ys))))
+(assert
+  (forall ((x Nat) (z Nat) (ys list))
+    (=> (= (equal x z) false)
+      (= (zdelete x (cons z ys)) (cons z (zdelete x ys))))))
+(assert (= (null nil) true))
+(assert (forall ((y Nat) (z list)) (= (null (cons y z)) false)))
+(assert (forall ((y list)) (= (zisPermutation nil y) (null y))))
+(assert
+  (forall ((y list) (z Nat) (xs list))
+    (= (zisPermutation (cons z xs) y)
+      (and (zelem z y) (zisPermutation xs (zdelete z y))))))
+(assert (= (bubble nil) (Pair2 false nil)))
+(assert
+  (forall ((y Nat))
+    (= (bubble (cons y nil)) (Pair2 false (cons y nil)))))
+(assert
+  (forall ((y Nat) (y2 Nat) (xs list) (b2 Bool) (zs list))
+    (=> (= (le y y2) true)
+      (=> (= (bubble (cons y2 xs)) (Pair2 b2 zs))
+        (= (bubble (cons y (cons y2 xs))) (Pair2 b2 (cons y zs)))))))
+(assert
+  (forall ((y Nat) (y2 Nat) (xs list) (c Bool) (ys list))
+    (=> (= (le y y2) false)
+      (=> (= (bubble (cons y xs)) (Pair2 c ys))
+        (= (bubble (cons y (cons y2 xs))) (Pair2 true (cons y2 ys)))))))
+(assert
+  (forall ((x list) (ys list))
+    (=> (= (bubble x) (Pair2 true ys)) (= (bubsort x) (bubsort ys)))))
+(assert
+  (forall ((x list) (ys list))
+    (=> (= (bubble x) (Pair2 false ys)) (= (bubsort x) x))))
+(assert (forall ((y Nat)) (= (le Z y) true)))
+(assert (forall ((z Nat)) (= (le (S z) Z) false)))
+(assert
+  (forall ((z Nat) (x2 Nat)) (= (le (S z) (S x2)) (le z x2))))
+(assert (= (equal Z Z) true))
+(assert (forall ((z Nat)) (= (equal Z (S z)) false)))
+(assert (forall ((x2 Nat)) (= (equal (S x2) Z) false)))
+(assert
+  (forall ((x2 Nat) (y2 Nat))
+    (= (equal (S x2) (S y2)) (equal x2 y2))))
+(assert-not (forall ((x list)) (zisPermutation (bubsort x) x)))
+(check-sat)

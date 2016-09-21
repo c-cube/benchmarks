@@ -1,0 +1,11 @@
+(declare-sort sk 0)
+(declare-datatypes () ((Nat (Z) (S (p Nat)))))
+(declare-fun plus (Nat Nat) Nat)
+(declare-fun double (Nat) Nat)
+(assert (forall ((y Nat)) (= (plus Z y) y)))
+(assert
+  (forall ((y Nat) (z Nat)) (= (plus (S z) y) (S (plus z y)))))
+(assert (= (double Z) Z))
+(assert (forall ((y Nat)) (= (double (S y)) (S (S (double y))))))
+(assert-not (forall ((x Nat)) (= (double x) (plus x x))))
+(check-sat)

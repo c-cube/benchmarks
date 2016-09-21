@@ -1,0 +1,22 @@
+(declare-datatypes () ((Tok (C) (D) (X) (Y) (Pl))))
+(declare-datatypes () ((list (nil) (cons (head Tok) (tail list)))))
+(declare-datatypes () ((T (TX) (TY))))
+(declare-datatypes ()
+  ((E (Plus (Plus_0 T) (Plus_1 E)) (Term (Term_0 T)))))
+(declare-fun linTerm (T) list)
+(declare-fun append (list list) list)
+(declare-fun lin (E) list)
+(assert (= (linTerm TX) (cons X nil)))
+(assert (= (linTerm TY) (cons Y nil)))
+(assert (forall ((y list)) (= (append nil y) y)))
+(assert
+  (forall ((y list) (z Tok) (xs list))
+    (= (append (cons z xs) y) (cons z (append xs y)))))
+(assert
+  (forall ((a T) (b E))
+    (= (lin (Plus a b))
+      (append (append (linTerm a) (cons Pl nil)) (lin b)))))
+(assert (forall ((t T)) (= (lin (Term t)) (linTerm t))))
+(assert-not
+  (forall ((u E) (v E)) (=> (= (lin u) (lin v)) (= u v))))
+(check-sat)
