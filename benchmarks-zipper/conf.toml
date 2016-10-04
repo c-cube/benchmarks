@@ -1,0 +1,27 @@
+
+[test]
+
+timeout = 30 # in s
+memory = 2000 # in MB
+provers = [ "zipperposition", "zipperposition-no-lemma" ]
+problems = ".*.smt2"
+default_expect= "unsat"
+dir = [ "tip-benchmarks/isaplanner/" ]
+
+[zipperposition]
+
+binary = "./zipperposition.native"
+cmd = "./zipperposition.native $file --timeout $timeout --mem-limit $memory"
+unsat = "SZS status (Theorem|Unsatisfiable)"
+sat = "SZS status (CounterSatisfiable|Satisfiable)"
+timeout = "SZS Status ResourceOut"
+version = "git:."
+
+[zipperposition-no-lemma]
+
+binary = "./zipperposition.native"
+cmd = "./zipperposition.native $file --timeout $timeout --mem-limit $memory --no-lemma-guess"
+unsat = "SZS status (Theorem|Unsatisfiable)"
+sat = "SZS status (CounterSatisfiable|Satisfiable)"
+timeout = "SZS Status ResourceOut"
+version = "git:."
